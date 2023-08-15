@@ -12,7 +12,7 @@ class deviceObject:
         self.connected = 0
 
 
-#Create portObject with source, target are distionary (data of deviceObject), *label are strings
+
 class portObject:
     def __init__(self,source, target, sourceLabel, targetLabel):
         self.data = {
@@ -36,6 +36,7 @@ class Vlan:
             "switchport": switchport
         }
 
+#funtion to sort vlan ascending based on host value
 def sortVlan(vlan):
     for x in range(0,len(vlan)-1):
         for y in range(x+1,len(vlan)):
@@ -53,8 +54,10 @@ vlan = [vlan0,vlan1,vlan2]
 
 sortVlan(vlan)
 i=0
-while i < len(vlan):
-    
+
+
+#Split vlan which has big value host
+while i < len(vlan):    
     if vlan[i].host>(24-ceil(len(vlan)/2)):
         numSplit=ceil((25-len(vlan)-sqrt((25-len(vlan))**2-4*vlan[i].host))/2)
         newHost=24-len(vlan)-numSplit+1
@@ -80,7 +83,7 @@ while i < len(vlan):
 
 sortVlan(vlan)
 
-
+#Merge vlan which has small value host
 i=0
 while i < len(vlan)-1:
     if (vlan[i].host+vlan[i+1].host<24-ceil(len(vlan)/2)):
@@ -96,15 +99,20 @@ while i < len(vlan)-1:
         sortVlan(vlan)
     else: i=i+1
 
+#Caculated number of Switch, Dist, Core
 accSwt_num=len(vlan)
 distSwt_num=ceil(accSwt_num/2)
 coreSwt_num=ceil(distSwt_num/3)
+#____________
+
 
 coreDevice=[]
 distDevice=[]
 accessDevice=[]
 router=[]
 i=0
+
+#function to define name and value port of deviceObject
 def definePort(source, numPort, typePort):
     counter=1
     octet=0
@@ -121,25 +129,32 @@ def definePort(source, numPort, typePort):
         source.switchPorts[portLabel]=False
 
 
+
+#Group and define Switch  
 for i in range(accSwt_num):
     add_access=deviceObject("accessSwt"+str(i),"Access Switch "+ str(i), "access")
     accessDevice.append(add_access)
     definePort(accessDevice[i], 24, "fa")
 
+#Group and define Dist 
 for i in range(distSwt_num):
     add_dist=deviceObject("distSwt"+str(i),"Distribution Switch "+ str(i), "distribution")
     distDevice.append(add_dist)
     definePort(distDevice[i],24,"Gi")
+
+#Group and define Core 
 for i in range(coreSwt_num):
     add_core=deviceObject("coreSwt"+str(i),"Core Switch "+ str(i), "core")
     coreDevice.append(add_core)
     definePort(coreDevice[i],24,"Gi")
 
+#define Router port
 add_router=deviceObject("router","Router","router")
 router.append(add_router)
 definePort(router[0],2,"Gi")
 
 
+#Connect Router - Core
 portDevice = []
 for rt in router:
     for core in coreDevice:
@@ -155,6 +170,8 @@ for rt in router:
                     core.connected +=1
                     break
 
+
+#Connect Core - Dist
 for core in coreDevice:
     for dist in distDevice:
         for portSource in list(core.switchPorts.keys()):
@@ -168,6 +185,8 @@ for core in coreDevice:
                     dist.switchPorts[portTarget]=True
                     dist.connected +=1
                     break
+
+#Connect Dist - Access Switch
 count=0
 for dist in distDevice:
     for access in accessDevice:
@@ -182,7 +201,10 @@ for dist in distDevice:
                     access.switchPorts[portTarget]=True
                     access.connected +=1
                     break
-    count+=1                
+    count+=1  
+
+
+#Connect 1 Vlan to 1 Access Switch 
 for VLAN in vlan:
     portIndex=0
     check = False
@@ -200,7 +222,8 @@ for VLAN in vlan:
             check=True
         if (check==True):
             break
-    
+
+#Define port connect Access Switch to Vlan    
 for VLAN in vlan:
     labelTarget = ""
     startPort=""
