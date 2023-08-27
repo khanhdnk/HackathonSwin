@@ -1,6 +1,4 @@
 from math import *
-
-
 class deviceObject:
     def __init__(self, id, label, layer):
         self.data = {
@@ -10,8 +8,6 @@ class deviceObject:
         }
         self.switchPorts = {}
         self.connected = 0
-
-
 
 class portObject:
     def __init__(self,source, target, sourceLabel, targetLabel):
@@ -24,7 +20,6 @@ class portObject:
             "sourceLabel": sourceLabel,
             "targetLabel": targetLabel
         }
-
 
 class Vlan:
     def __init__(self, host, id, name, switch, switchport):
