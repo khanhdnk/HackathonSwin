@@ -215,7 +215,8 @@ def main():
     # Connect Dist - Access Switch
     connectVlan(merge_vlan, accessDevice)
     defineVlanPort(vlan, accessDevice, portDevice, distSwt_num)
-    print(accessDevice)
+    networkDevice = accessDevice + distDevice + coreDevice + router
+    return networkDevice, portDevice
 
 
 main()
