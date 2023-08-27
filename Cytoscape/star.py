@@ -42,63 +42,70 @@ def definePort(source, numPort, typePort):
         source.switchPorts[portLabel]=False
 
 
-#data input
-pcNum=3
-printerNum=2
-wifiNum=2
-portDevice = []
-accessDevice=[]
-router=[]
-sum=pcNum+printerNum+wifiNum
-accessSwitch=[]
-accSwt_num=ceil(sum/23)
-#define Device
-for i in range(pcNum):
-    add_device=deviceObject("pc"+str(i),"PC "+str(i), "device")
-    definePort(add_device,3, "fa")
-    accessDevice.append(add_device)
-    
-
-for i in range(printerNum):
-    add_device=deviceObject("printer"+str(i),"Printer "+str(i), "device")
-    definePort(add_device,3, "fa")
-    accessDevice.append(add_device)
-
-for i in range(wifiNum):
-    add_device=deviceObject("wifi"+str(i),"Wifi "+str(i), "device")
-    definePort(add_device,3, "fa")
-    accessDevice.append(add_device)
-
-#define Switch
-for i in range(accSwt_num):
-    add_switch=deviceObject("accessSwt"+str(i),"Access Switch "+str(i), "access")
-    definePort(add_switch,24, "fa")
-    accessSwitch.append(add_switch)
-
-#define Router port
-add_router=deviceObject("router","Router","router")
-router.append(add_router)
-definePort(router[0],2,"Gi")
 
 
-#Connect Router - Switch
-portDevice = []
-for rt in router:
-    for access in accessSwitch:
-        for portSource in list(rt.switchPorts.keys()):
-            if (rt.switchPorts[portSource]==False):
-                portTarget = list(access.switchPorts.keys())[list(rt.switchPorts.keys()).index(portSource)]
-                if (access.switchPorts[portTarget]==False):
-                    new_port=portObject(rt.data,access.data,portSource,portTarget)
+def defineDevice(num,type,array,port):
+    for i in range(num):
+        add_device=deviceObject(type+str(i),type+" "+str(i), "device")
+        definePort(add_device,port, "fa")
+        array.append(add_device)
+        
+        
+
+
+def connect(source,target,portDevice):
+    for portSource in list(source.switchPorts.keys()):
+            if (source.switchPorts[portSource]==False):
+                portTarget = list(target.switchPorts.keys())[0]
+                if (target.switchPorts[portTarget]==False):
+                    new_port=portObject(source.data,target.data,portSource,portTarget)
                     portDevice.append(new_port)
-                    rt.switchPorts[portSource]=True
-                    rt.connected +=1
-                    access.switchPorts[portTarget]=True
-                    access.connected +=1
+                    source.switchPorts[portSource]=True
+                    source.connected +=1
+                    target.switchPorts[portTarget]=True
+                    target.connected +=1
                     break
+                
+def createPortObject(port_array, source_devices, target_devices):
+    for target in target_devices:
+        for source in source_devices:
+            connect(source,target,port_array)
 
-#connect Device to Switch
-counterDe=0
-counterSwt=0
 
 
+def main():
+    #data input
+    pcNum=2
+    printerNum=4
+    wifiNum=2
+    sum=pcNum+printerNum+wifiNum
+    accSwt_num=ceil(sum/23)
+    
+    portDevice = []
+    accessDevice=[]
+    router=[]
+    portDevice = []
+    accessSwitch=[]
+
+    
+    defineDevice(pcNum,"pc",accessDevice,3)
+    defineDevice(printerNum,"printer",accessDevice,3)
+    defineDevice(wifiNum,"wifi",accessDevice,3)
+
+    defineDevice(accSwt_num,"accessSwt",accessSwitch,24)
+
+    #define Router port
+    add_router=deviceObject("router","Router","router")
+    router.append(add_router)
+    definePort(router[0],2,"Gi")
+    
+    createPortObject(portDevice, router, accessSwitch)
+    createPortObject(portDevice, accessSwitch, accessDevice)
+    networkDevice = accessDevice + accessSwitch  + router
+    return networkDevice, portDevice
+    
+main()
+
+
+
+    
