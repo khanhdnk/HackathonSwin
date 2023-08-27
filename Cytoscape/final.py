@@ -1,3 +1,5 @@
+# Online Python compiler (interpreter) to run Python online.
+# Write Python 3 code in this online editor and run it.
 from math import *
 import json
 
@@ -116,12 +118,14 @@ def definePort(source, numPort, typePort):
         if counter > 24:
             octet += 1
             counter = 1
+        portLabel=""
         if typePort == "Gi":
             portLabel = typePort + "1/" + str(octet) + "/" + str(counter)
         else:
             if typePort == "fa":
                 portLabel = typePort + str(octet) + "/" + str(counter)
         counter += 1
+        
         source.switchPorts[portLabel] = False
 
 
@@ -138,7 +142,7 @@ def defineDevice(number, device_type, device_layer):
         if device_layer == "Core":
             definePort(devices[i], 24, "Gi")
         else:
-            definePort(devices[i], 24, "Fa")
+            definePort(devices[i], 24, "fa")
     return devices
 
 
@@ -158,14 +162,14 @@ portDevice = []
 
 
 def createPortObject(port_array, source_devices, target_devices):
+    count = 0
     for s_device in source_devices:
         for t_device in target_devices:
-            for portSource in list(source_devices.switchPorts.keys()):
-                if source_devices.switchPorts[portSource] == False:
-                    portTarget = list(target_devices.switchPorts.keys())[
-                        list(source_devices.switchPorts.keys()).index(portSource)
+            for portSource in list(s_device.switchPorts.keys()):
+                if s_device.switchPorts[portSource] == False:
+                    portTarget = list(t_device.switchPorts.keys())[count
                     ]
-                    if s_device.switchPorts[portTarget] == False:
+                    if t_device.switchPorts[portTarget] == False:
                         new_port = portObject(
                             s_device.data, t_device.data, portSource, portTarget
                         )
@@ -175,30 +179,14 @@ def createPortObject(port_array, source_devices, target_devices):
                         t_device.switchPorts[portTarget] = True
                         t_device.connected += 1
                         break
-
+        count+=1
 
 createPortObject(portDevice, router, coreDevice)
 # Connect Core - Dist
 createPortObject(portDevice, coreDevice, distDevice)
-
+createPortObject(portDevice, distDevice, accessDevice)
 # Connect Dist - Access Switch
-count = 0
-for dist in distDevice:
-    for access in accessDevice:
-        for portSource in list(dist.switchPorts.keys()):
-            if dist.switchPorts[portSource] == False:
-                portTarget = list(access.switchPorts.keys())[count]
-                if access.switchPorts[portTarget] == False:
-                    new_port = portObject(
-                        dist.data, access.data, portSource, portTarget
-                    )
-                    portDevice.append(new_port)
-                    dist.switchPorts[portSource] = True
-                    dist.connected += 1
-                    access.switchPorts[portTarget] = True
-                    access.connected += 1
-                    break
-    count += 1
+
 
 
 # Connect 1 Vlan to 1 Access Switch
@@ -235,3 +223,4 @@ for VLAN in vlan:
                 labelTarget = startPort + "-" + endPort[6:]
             new_port = portObject(accdv.data, {"id": VLAN.id}, labelTarget, "Ethernet")
             portDevice.append(new_port)
+            
