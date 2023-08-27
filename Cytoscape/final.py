@@ -1,5 +1,3 @@
-# Online Python compiler (interpreter) to run Python online.
-# Write Python 3 code in this online editor and run it.
 from math import *
 import json
 
@@ -77,24 +75,29 @@ def split_vlan(vlan):
 
 splitted_vlan = split_vlan(sorted_vlan)
 
-# Merge vlan which has small value host
 
-i = 0
-while i < len(vlan) - 1:
-    if vlan[i].host + vlan[i + 1].host < 24 - ceil(len(vlan) / 2):
-        newVlan = Vlan(
-            vlan[i].host + vlan[i + 1].host,
-            vlan[i].id + "+" + vlan[i + 1].id,
-            vlan[i].name,
-            "",
-            {},
-        )
-        vlan.append(newVlan)
-        vlan.pop(i)
-        vlan.pop(i)
-        sortVlan(vlan)
-    else:
-        i = i + 1
+# Merge vlan which has small value host
+def mergeVlan(vlan):
+    i = 0
+    while i < len(vlan) - 1:
+        if vlan[i].host + vlan[i + 1].host < 24 - ceil(len(vlan) / 2):
+            newVlan = Vlan(
+                vlan[i].host + vlan[i + 1].host,
+                vlan[i].id + "+" + vlan[i + 1].id,
+                vlan[i].name,
+                "",
+                [],
+            )
+            vlan.append(newVlan)
+            vlan.pop(i)
+            vlan.pop(i)
+            sortVlan(vlan)
+        else:
+            i = i + 1
+    return vlan
+
+
+vlan = mergeVlan(vlan)
 
 # Caculated number of Switch, Dist, Core
 accSwt_num = len(vlan)
@@ -189,36 +192,45 @@ createPortObject(portDevice, distDevice, accessDevice)
 
 
 # Connect 1 Vlan to 1 Access Switch
-for VLAN in vlan:
-    portIndex = 0
-    check = False
-    for access in accessDevice:
-        if VLAN.host <= 24 - access.connected:
-            for i in range(VLAN.host):
-                for port in access.switchPorts:
-                    if access.switchPorts[port] == False:
-                        VLAN.port["switch"] = access.data["id"]
-                        portIndex += 1
-                        VLAN.port["switchport"].append(portIndex)
-                        access.switchPorts[port] = True
-                        access.connected += 1
-                        break
-            check = True
-        if check == True:
-            break
+def connectVlan(vlan, accessDevice):
+    for VLAN in vlan:
+        portIndex = 0
+        check = False
+        for access in accessDevice:
+            if VLAN.host <= 24 - access.connected:
+                for i in range(VLAN.host):
+                    for port in access.switchPorts:
+                        if access.switchPorts[port] == False:
+                            VLAN.port["switch"] = access.data["id"]
+                            portIndex += 1
+                            VLAN.port["switchport"].append(portIndex)
+                            access.switchPorts[port] = True
+                            access.connected += 1
+                            break
+                check = True
+            if check == True:
+                break
+
 
 # Define port connect Access Switch to Vlan
-for VLAN in vlan:
-    labelTarget = ""
-    startPort = ""
-    endPort = ""
-    for accdv in accessDevice:
-        if VLAN.port["switch"] == accdv.data["id"]:
-            startPort = list(access.switchPorts.keys())[distSwt_num]
-            endPort = list(access.switchPorts.keys())[distSwt_num + VLAN.host - 1]
-            if endPort.find("fa") != -1:
-                labelTarget = startPort + "-" + endPort[4:]
-            if endPort.find("Gi") != -1:
-                labelTarget = startPort + "-" + endPort[6:]
-            new_port = portObject(accdv.data, {"id": VLAN.id}, labelTarget, "Ethernet")
-            portDevice.append(new_port)
+def defineVlanPort(vlan, accessDevice):
+    for VLAN in vlan:
+        labelTarget = ""
+        startPort = ""
+        endPort = ""
+        for access in accessDevice:
+            if VLAN.port["switch"] == access.data["id"]:
+                startPort = list(access.switchPorts.keys())[distSwt_num]
+                endPort = list(access.switchPorts.keys())[distSwt_num + VLAN.host - 1]
+                if endPort.find("fa") != -1:
+                    labelTarget = startPort + "-" + endPort[4:]
+                if endPort.find("Gi") != -1:
+                    labelTarget = startPort + "-" + endPort[6:]
+                new_port = portObject(
+                    access.data, {"id": VLAN.id}, labelTarget, "Ethernet"
+                )
+                portDevice.append(new_port)
+
+
+connectVlan(vlan, accessDevice)
+defineVlanPort(vlan, accessDevice)
