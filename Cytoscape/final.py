@@ -1,4 +1,3 @@
-
 from math import *
 import json
 
@@ -39,15 +38,6 @@ def sortVlan(vlan):
     return vlan
 
 
-# Data input here
-vlan0 = Vlan(12, "vlan0", "An", "", [])
-vlan1 = Vlan(13, "vlan1", "Anal", "", [])
-vlan2 = Vlan(14, "vlan2", "Analyst", "", [])
-vlan = [vlan0, vlan1, vlan2]
-# --------------
-sorted_vlan = sortVlan(vlan)
-
-
 def split_vlan(vlan):
     i = 0
     # Split vlan which has big value host
@@ -74,8 +64,6 @@ def split_vlan(vlan):
     return vlan
 
 
-splitted_vlan = split_vlan(sorted_vlan)
-
 # Merge vlan which has small value host
 def mergeVlan(vlan):
     i = 0
@@ -95,20 +83,6 @@ def mergeVlan(vlan):
         else:
             i = i + 1
     return vlan
-vlan=mergeVlan(vlan)
-
-# Caculated number of Switch, Dist, Core
-accSwt_num = len(vlan)
-distSwt_num = ceil(accSwt_num / 2)
-coreSwt_num = ceil(distSwt_num / 3)
-# ____________
-
-
-coreDevice = []
-distDevice = []
-accessDevice = []
-router = []
-i = 0
 
 
 # function to define name and value port of deviceObject
@@ -119,14 +93,14 @@ def definePort(source, numPort, typePort):
         if counter > 24:
             octet += 1
             counter = 1
-        portLabel=""
+        portLabel = ""
         if typePort == "Gi":
             portLabel = typePort + "1/" + str(octet) + "/" + str(counter)
         else:
             if typePort == "fa":
                 portLabel = typePort + str(octet) + "/" + str(counter)
         counter += 1
-        
+
         source.switchPorts[portLabel] = False
 
 
@@ -147,29 +121,13 @@ def defineDevice(number, device_type, device_layer):
     return devices
 
 
-accessDevice = defineDevice(accSwt_num, "Switch", "Access")
-distDevice = defineDevice(distSwt_num, "Switch", "Dist")
-coreDevice = defineDevice(coreSwt_num, "Switch", "Core")
-
-
-# define Router port
-add_router = deviceObject("router", "Router", "router")
-router.append(add_router)
-definePort(router[0], 2, "Gi")
-
-
-# Connect Router - Core
-portDevice = []
-
-
 def createPortObject(port_array, source_devices, target_devices):
     count = 0
     for s_device in source_devices:
         for t_device in target_devices:
             for portSource in list(s_device.switchPorts.keys()):
                 if s_device.switchPorts[portSource] == False:
-                    portTarget = list(t_device.switchPorts.keys())[count
-                    ]
+                    portTarget = list(t_device.switchPorts.keys())[count]
                     if t_device.switchPorts[portTarget] == False:
                         new_port = portObject(
                             s_device.data, t_device.data, portSource, portTarget
@@ -180,18 +138,11 @@ def createPortObject(port_array, source_devices, target_devices):
                         t_device.switchPorts[portTarget] = True
                         t_device.connected += 1
                         break
-        count+=1
-
-createPortObject(portDevice, router, coreDevice)
-# Connect Core - Dist
-createPortObject(portDevice, coreDevice, distDevice)
-createPortObject(portDevice, distDevice, accessDevice)
-# Connect Dist - Access Switch
-
+        count += 1
 
 
 # Connect 1 Vlan to 1 Access Switch
-def connectVlan(vlan,accessDevice):
+def connectVlan(vlan, accessDevice):
     for VLAN in vlan:
         portIndex = 0
         check = False
@@ -210,21 +161,62 @@ def connectVlan(vlan,accessDevice):
             if check == True:
                 break
 
+
 # Define port connect Access Switch to Vlan
-def defineVlanPort(vlan,accessDevice):
+def defineVlanPort(vlan, accessDevice, portDevice, number):
     for VLAN in vlan:
         labelTarget = ""
         startPort = ""
         endPort = ""
         for access in accessDevice:
             if VLAN.port["switch"] == access.data["id"]:
-                startPort = list(access.switchPorts.keys())[distSwt_num]
-                endPort = list(access.switchPorts.keys())[distSwt_num + VLAN.host - 1]
+                startPort = list(access.switchPorts.keys())[number]
+                endPort = list(access.switchPorts.keys())[number + VLAN.host - 1]
                 if endPort.find("fa") != -1:
                     labelTarget = startPort + "-" + endPort[4:]
                 if endPort.find("Gi") != -1:
                     labelTarget = startPort + "-" + endPort[6:]
-                new_port = portObject(access.data, {"id": VLAN.id}, labelTarget, "Ethernet")
+                new_port = portObject(
+                    access.data, {"id": VLAN.id}, labelTarget, "Ethernet"
+                )
                 portDevice.append(new_port)
-connectVlan(vlan,accessDevice)
-defineVlanPort(vlan,accessDevice)
+
+
+def main():
+    # Data input here
+    vlan0 = Vlan(12, "vlan0", "An", "", [])
+    vlan1 = Vlan(13, "vlan1", "Anal", "", [])
+    vlan2 = Vlan(14, "vlan2", "Analyst", "", [])
+    vlan = [vlan0, vlan1, vlan2]
+    # --------------
+    sorted_vlan = sortVlan(vlan)
+    splitted_vlan = split_vlan(sorted_vlan)
+    merge_vlan = mergeVlan(splitted_vlan)
+    # Caculated number of Switch, Dist, Core
+    accSwt_num = len(vlan)
+    distSwt_num = ceil(accSwt_num / 2)
+    coreSwt_num = ceil(distSwt_num / 3)
+    # ____________
+    accessDevice = defineDevice(accSwt_num, "Switch", "Access")
+    distDevice = defineDevice(distSwt_num, "Switch", "Dist")
+    coreDevice = defineDevice(coreSwt_num, "Switch", "Core")
+    # define Router port
+    router = []
+    add_router = deviceObject("router", "Router", "router")
+    router.append(add_router)
+    definePort(router[0], 2, "Gi")
+
+    # Connect Router - Core
+    portDevice = []
+    createPortObject(portDevice, router, coreDevice)
+    # Connect Core - Dist
+    createPortObject(portDevice, coreDevice, distDevice)
+    createPortObject(portDevice, distDevice, accessDevice)
+    # Connect Dist - Access Switch
+    connectVlan(merge_vlan, accessDevice)
+    defineVlanPort(vlan, accessDevice, portDevice, distSwt_num)
+    networkDevice = accessDevice + distDevice + coreDevice + router
+    return networkDevice, portDevice
+
+
+main()
