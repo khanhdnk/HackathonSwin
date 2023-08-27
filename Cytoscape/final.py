@@ -118,14 +118,14 @@ def definePort(source, numPort, typePort):
         if counter > 24:
             octet += 1
             counter = 1
-        portLabel=""
+        portLabel = ""
         if typePort == "Gi":
             portLabel = typePort + "1/" + str(octet) + "/" + str(counter)
         else:
             if typePort == "fa":
                 portLabel = typePort + str(octet) + "/" + str(counter)
         counter += 1
-        
+
         source.switchPorts[portLabel] = False
 
 
@@ -167,8 +167,7 @@ def createPortObject(port_array, source_devices, target_devices):
         for t_device in target_devices:
             for portSource in list(s_device.switchPorts.keys()):
                 if s_device.switchPorts[portSource] == False:
-                    portTarget = list(t_device.switchPorts.keys())[count
-                    ]
+                    portTarget = list(t_device.switchPorts.keys())[count]
                     if t_device.switchPorts[portTarget] == False:
                         new_port = portObject(
                             s_device.data, t_device.data, portSource, portTarget
@@ -179,14 +178,14 @@ def createPortObject(port_array, source_devices, target_devices):
                         t_device.switchPorts[portTarget] = True
                         t_device.connected += 1
                         break
-        count+=1
+        count += 1
+
 
 createPortObject(portDevice, router, coreDevice)
 # Connect Core - Dist
 createPortObject(portDevice, coreDevice, distDevice)
 createPortObject(portDevice, distDevice, accessDevice)
 # Connect Dist - Access Switch
-
 
 
 # Connect 1 Vlan to 1 Access Switch
@@ -223,4 +222,3 @@ for VLAN in vlan:
                 labelTarget = startPort + "-" + endPort[6:]
             new_port = portObject(accdv.data, {"id": VLAN.id}, labelTarget, "Ethernet")
             portDevice.append(new_port)
-            
