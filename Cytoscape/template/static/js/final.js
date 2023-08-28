@@ -55,25 +55,12 @@ vlan.forEach(VLAN => {
   })
 });
 
-cy.add([{ data: router[0].data }]);
-
-for (let i = 0; i < coreDevice.length; i++) {
+for (let i = 0; i < networkDevice.length; i++) {
   cy.add({
-    data: coreDevice[i].data
+    data: networkDevice[i].data
   });
 };
 
-for (let i = 0; i < distDevice.length; i++) {
-  cy.add({
-    data: distDevice[i].data
-  });
-};
-
-for (let i = 0; i < accessDevice.length; i++) {
-  cy.add({
-    data: accessDevice[i].data
-  });
-};
 
 for (let i = 0; i < portDevice.length; i++) {
   cy.add(
