@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-center p-5">Add Your Configuration</h1>
-<form  method="post">{% csrf_token %}
-    {{ form.as_p }}
-    {% if form.errors %}
-    <div class="alert alert-danger my-5">
-        {{form.errors.title.as_text}}
+
+<form  method="post" class="col d-flex justify-content-center">
+    <div class="">
+        <h1 class="text-center p-5">Add Your Configuration</h1>
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if form.errors %}
+        <div class="alert alert-danger my-5">
+            {{form.errors.title.as_text}}
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary my-5">Submit</button>
     </div>
-    {% endif %}
-    <button type="submit" class="btn btn-primary my-5">Submit</button>
 </form>
 
 

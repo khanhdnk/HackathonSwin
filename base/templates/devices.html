@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="p-5">
+    <h1 class="text-center pb-5">Available Devices</h1>
+    <div class="row">
+        <div class="col-lg-3 col-md-8 col-sm-10">
+          <div class="card">
+            <img src="{% static 'images/sw2960.jpg' %}" class="card-img-top" alt="...">
+            <div class="card-body bg-light">
+              <h5 class="card-title">Cisco 2960 Switch</h5>
+              <p class="card-text">The Cisco Catalyst 2960-X  Series PoE power allocation is dynamic, and power mapping scales up to a maximum of 740W of PoE+ power.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-8 col-sm-10">
+          <div class="card">
+            <img src="{% static 'images/sw3650.jpg' %}" class="card-img-top" alt="...">
+            <div class="card-body bg-light">
+              <h5 class="card-title">Cisco 3650 Switch</h5>
+              <p class="card-text">Cisco Catalyst 3650 Series Switches, designed and engineered by Cisco, provide optimum power-saving, EEE, low-power operations for industry.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-8 col-sm-10">
+          <div class="card">
+            <img src="{% static 'images/rt4321.jpg' %}" class="card-img-top" alt="...">
+            <div class="card-body bg-light">
+              <h5 class="card-title">Cisco 4321 Router</h5>
+              <p class="card-text">Cisco 4321 Integrated Services Router; Field Notice: FN - 72578 - Cisco IOS XE - Smart Licensing Using Policy Might Cause High CPU/Memory.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-8 col-sm-10">
+          <div class="card">
+            <img src="{% static 'images/rt4331.png' %}" class="card-img-top" alt="...">
+            <div class="card-body bg-light">Cisco 4331 Router</h5>
+              <p class="card-text">Cisco 4331 Integrated Services Router; Field Notice: FN - 72578 - Cisco IOS XE - Smart Licensing Using Policy Might Cause High CPU/Memory.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+</main>
+
+{% endblock %}

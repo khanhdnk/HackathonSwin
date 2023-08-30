@@ -28,39 +28,7 @@
               <a type="button" class="btn btn-primary" href="/signin">Edit Your Information</a>
               {% endif %}
           </div>
-      </div>
-        <hr style="background-color: #0c5460;">
-      <h4 id="list-item-2">Input Departments and Hosts</h4>
-      <div class="pb-5 d-flex flex-column flex-lg-row pt-4">
-          <img src="{% static 'images/input.jpeg' %}" class="col-12 col-lg-5">
-          <div class="col-lg-8 pt-3 pb-3">
-
-            <span>Welcome to the hub for managing your departments and hosts. Simplifying your experience, this section empowers you to make updates, modifications, or removals with ease.</span>
-
-            <p>Your entities, your control. Let's get started.</p>
-            {% if user.is_authenticated %}
-              <a type="button" class="btn btn-primary" href="/editprofile">Manage Your Inputs</a>
-              {% else %}
-              <a type="button" class="btn btn-primary" href="/signin">Manage Your Inputs</a>
-              {% endif %}
-          </div>
-      </div>
-        <hr style="background-color: #0c5460;">
-      <h4 id="list-item-3">My Configurations</h4>
-      <div class="pb-5 d-flex flex-column flex-lg-row pt-4">
-          <img src="{% static 'images/gotoconfig.png' %}" class="col-12 col-lg-5">
-          <div class="col-lg-8 pt-3 pb-3">
-
-            <span>Welcome to the Configuration Management Zone. Here, you're in command of customizations. Effortlessly adjust, modify, or remove configurations to match your preferences.</span>
-
-            <p>Your settings, your way. Let's begin.</p>
-              {% if user.is_authenticated %}
-              <a type="button" class="btn btn-primary" href="/editprofile">Your Configurations</a>
-              {% else %}
-              <a type="button" class="btn btn-primary" href="/signin">Your Configurations</a>
-              {% endif %}
-          </div>
-      </div>
+      </div>      
         <hr style="background-color: #0c5460;">
       <h4 id="list-item-4">Device Information</h4>
       <div class="pb-5 d-flex flex-column flex-lg-row pt-4">
@@ -70,7 +38,7 @@
               <span>Welcome to the Device Information Dashboard. Here, you're in charge of your device details. Effortlessly update, modify, or remove device information as needed.</span>
             <p>Your devices, your control. Let's dive in.</p>
               {% if user.is_authenticated %}
-              <a type="button" class="btn btn-primary" href="/editprofile">Explore Devices</a>
+              <a type="button" class="btn btn-primary" href="/devices">Explore Devices</a>
               {% else %}
               <a type="button" class="btn btn-primary" href="/signin">Explore Devices</a>
               {% endif %}

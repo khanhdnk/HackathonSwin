@@ -28,22 +28,7 @@
               {% endif %}
           </div>
       </div>
-        <hr style="background-color: #0c5460;">
-      <h4 id="list-item-2">Add Configuration</h4>
-      <div class="pb-5 d-flex flex-column flex-lg-row pt-4">
-          <img src="{% static 'images/networkicon-removebg-preview.png' %}" class="col-12 col-lg-5">
-          <div class="col-lg-8 pt-3 pb-3">
-
-            <span>Welcome to the hub for adding your departments and hosts. Simplifying your experience, this section empowers you to add configurations with ease.</span>
-
-            <p>Your entities, your control. Let's get started.</p>
-            {% if user.is_authenticated %}
-              <a type="button" class="btn btn-primary" href="/topology/addconfig">Add Configuration</a>
-              {% else %}
-              <a type="button" class="btn btn-primary" href="/signin">Add Configuration</a>
-              {% endif %}
-          </div>
-      </div>
+        
         <hr style="background-color: #0c5460;">
       <h4 id="list-item-3">Add Connection</h4>
       <div class="pb-5 d-flex flex-column flex-lg-row pt-4">
