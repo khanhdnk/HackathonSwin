@@ -1,6 +1,9 @@
-#Network Configurator Website
+# Network Configurator Website
+
 This project was created to compete in Swinburne Hackathon 2023
-#Installation
+
+# Installation
+
 Clone the repository
 ```python
 
